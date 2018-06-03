@@ -1,23 +1,7 @@
-import random
+import json
 from uuid import uuid4
 from datetime import datetime
-from faker import Faker
 from .models import Sensor
-
-def create_sample():
-	sample_list = []
-	fake = Faker()
-	for _ in range(1, 100):
-		sample_dict = {
-			"device_uuid":uuid4().hex,
-			"sensor_type":"temperature",
-			"sensor_value":random.uniform(0.0, 100.0),
-			"start_time":fake.date_this_year(before_today=False, after_today=True),
-			"end_time":fake.date_this_year(before_today=False, after_today=True),
-			"sensor_reading_time":fake.date_this_year(before_today=False, after_today=True)
-		}
-		sensor = Sensor(**sample_dict)
-		sensor.save()
 
 def create(args):
 	if args.sensor_type not in ['humidity', 'temperature']:
@@ -56,4 +40,8 @@ def get_sensor_data(args):
 		"sensor_reading_time":{
 		"$gte":datetime.fromtimestamp(int(args.get('start_time')[0])), "$lte":datetime.fromtimestamp(int(args.get('end_time')[0]))
 	}}
-	print(Sensor.objects(__raw__=query))
+	try:
+		sensor_query = Sensor.objects(__raw__=query)
+		return [json.loads(sensor.to_json()) for sensor in sensor_query],200
+	except Exception as ex:
+		return {"error":"Could not retrive sensor information"},500
