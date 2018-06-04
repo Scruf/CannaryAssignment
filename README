@@ -1,0 +1,4 @@
+Application was created using Flask
+For the database I used MongoDB and Flask-Mongoengine is the ORM
+To run it in production I used gunicorn the command to run it gunicorn manage:app -w 4 -b 0.0.0.0:5000
+To use your MongoDB instance create environment variable MONGO_URL to store your mongodb connection string
